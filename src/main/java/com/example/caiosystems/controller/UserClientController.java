@@ -15,18 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.caiosystems.infrastructure.entity.UserClient;
 import com.example.caiosystems.service.UserClientService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/user")
 public class UserClientController {
 	
 	private final UserClientService service;
 	
 	@PostMapping
 	public ResponseEntity<UserClient> newUser(
-			@RequestBody UserClient body
+		@Valid @RequestBody UserClient body
 	){
 		return ResponseEntity.ok(service.createUser(body));
 	}
@@ -43,8 +44,8 @@ public class UserClientController {
 	
 	@PutMapping
 	public ResponseEntity<UserClient> editUser(
-			Long id, 
-			@RequestBody UserClient body
+		Long id, 
+		@RequestBody UserClient body
 	){
 		return ResponseEntity.ok(service.updateUser(id, body));
 	}
@@ -52,6 +53,6 @@ public class UserClientController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteUser(@PathVariable Long id){
 		service.deleteUser(id);
-		return ResponseEntity.ok("Usuário com id: "+id+" deletado com sucesso");
+		return ResponseEntity.ok("User with id: "+id+" successfully deleted");
 	}
 }

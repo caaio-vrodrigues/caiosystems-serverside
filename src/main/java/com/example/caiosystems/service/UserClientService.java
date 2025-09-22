@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.caiosystems.customexception.ResourceNotFoundException;
 import com.example.caiosystems.infrastructure.entity.UserClient;
 import com.example.caiosystems.infrastructure.repository.UserClientRepository;
 
@@ -21,7 +22,7 @@ public class UserClientService {
 	
 	public UserClient searchUserById(Long id) {
 		return repo.findById(id).orElseThrow(()->
-			new RuntimeException("User not found"));
+			new ResourceNotFoundException("Unable to find user with id: "+id+", verify the value before sending"));
 	}
 	
 	public List<UserClient> searchAllUsers() {
@@ -35,6 +36,8 @@ public class UserClientService {
 	}
 	
 	public void deleteUser(Long id) {
+		if(!repo.existsById(id)) 
+			throw new ResourceNotFoundException("Unable delete user with id: "+id+", verify the value before sending");
 		repo.deleteById(id);
 	}
 }

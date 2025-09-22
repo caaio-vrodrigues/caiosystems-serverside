@@ -6,6 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,8 +25,22 @@ public class UserClient {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
-	@Column(name="username")
-	private String username;
-	@Column(name="password")
+    
+    @Column(
+    	name="username", 
+    	nullable=false, 
+    	unique=true)
+    @NotBlank(message="Username cannot be blank")
+    @Email(message="Invalid e-mail format")
+    private String username;
+	
+    
+	@Column(
+		name="password", 
+		nullable=false)
+	@Size(
+    	min=8, 
+    	message="Invalid password lenght, minimum 8 characters required")
+    @NotBlank(message="Password cannot be blank")
 	private String password;
 }
