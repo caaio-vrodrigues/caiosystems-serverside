@@ -33,7 +33,6 @@ public class UserClient {
     @NotBlank(message="Username cannot be blank")
     @Email(message="Invalid e-mail format")
     private String username;
-	
     
 	@Column(
 		name="password", 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.caiosystems.infrastructure.entity.UserClient;
@@ -25,11 +26,16 @@ public class UserClientController {
 	
 	private final UserClientService service;
 	
-	@PostMapping
+	@PostMapping("/register")
 	public ResponseEntity<UserClient> newUser(
 		@Valid @RequestBody UserClient body
 	){
 		return ResponseEntity.ok(service.createUser(body));
+	}
+	
+	@PostMapping("/login")
+	public ResponseEntity<Boolean> login(String username, String password){
+		return ResponseEntity.ok(service.verifyUser(username, password));
 	}
 	
 	@GetMapping("/{id}")
@@ -45,7 +51,7 @@ public class UserClientController {
 	@PutMapping
 	public ResponseEntity<UserClient> editUser(
 		Long id, 
-		@RequestBody UserClient body
+		@Valid @RequestBody UserClient body
 	){
 		return ResponseEntity.ok(service.updateUser(id, body));
 	}

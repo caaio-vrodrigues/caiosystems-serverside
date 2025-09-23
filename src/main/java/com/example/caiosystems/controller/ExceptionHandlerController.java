@@ -7,11 +7,18 @@ import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.example.caiosystems.customexception.ResourceNotFoundException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class ExceptionHandlerController {
@@ -20,22 +27,26 @@ public class ExceptionHandlerController {
 	private static final String STATUS = "status";
 	private static final String ERROR = "error";
 	private static final String MESSAGE = "message";
+	private static final String PATH = "path";
 
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<Object> handleResourceNotFound(
-		ResourceNotFoundException e
+		ResourceNotFoundException e,
+		HttpServletRequest request
 	){
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put(TIMESTAMP_KEY, LocalDateTime.now());
 		body.put(STATUS, HttpStatus.NOT_FOUND.value());
 		body.put(ERROR, "Not Found");
 		body.put(MESSAGE, e.getMessage());
+		body.put(PATH, request.getRequestURI());
 		return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolation(
-    	DataIntegrityViolationException e
+    	DataIntegrityViolationException e,
+    	HttpServletRequest request
     ){
         Map<String, Object> body = new LinkedHashMap<>();
         String errorMessage = 
@@ -54,12 +65,14 @@ public class ExceptionHandlerController {
             }
         }
         body.put(MESSAGE, errorMessage);
+        body.put(PATH, request.getRequestURI());
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 	
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValid(
-        MethodArgumentNotValidException e
+        MethodArgumentNotValidException e,
+        HttpServletRequest request
     ){
         Map<String, Object> body = new LinkedHashMap<>();
         String errorMessage = "Validation failed";
@@ -73,6 +86,7 @@ public class ExceptionHandlerController {
             	.getDefaultMessage();
         }
         body.put(MESSAGE, errorMessage);
+        body.put(PATH, request.getRequestURI());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }
