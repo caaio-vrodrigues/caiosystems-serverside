@@ -30,7 +30,8 @@ public class UserClientService {
 	
 	public UserClient searchUserById(Long id) {
 		return repo.findById(id).orElseThrow(()->
-			new ResourceNotFoundException("Unable to find user with id: "+id+", verify the value before sending"));
+			new ResourceNotFoundException("Unable to find user with id: "+id+
+				", verify the value before sending"));
 	}
 	
 	public List<UserClient> searchAllUsers() {
@@ -46,7 +47,8 @@ public class UserClientService {
 	
 	public void deleteUser(Long id) {
 		if (!repo.existsById(id)) 
-			throw new ResourceNotFoundException("Unable to delete user with id: "+id+", verify the value before sending");
+			throw new ResourceNotFoundException("Unable to delete user with id: "
+				+id+", verify the value before sending");
 		repo.deleteById(id);
 	}
 	

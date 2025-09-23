@@ -14,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.example.caiosystems.customexception.CustomAuthEntryPoint;
 import com.example.caiosystems.service.MyUserDetailsService;
 
 @Configuration
@@ -22,6 +23,12 @@ public class SecurityConfig {
 	
 	@Autowired
 	private MyUserDetailsService detailsService;
+	
+	private final CustomAuthEntryPoint customAuthEntryPoint;
+	
+	public SecurityConfig(CustomAuthEntryPoint customAuthEntryPoint) {
+        this.customAuthEntryPoint = customAuthEntryPoint;
+    }
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(
@@ -43,6 +50,8 @@ public class SecurityConfig {
 				headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
 			.sessionManagement(session -> 
 				session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+			.exceptionHandling(exception -> exception
+				.authenticationEntryPoint(customAuthEntryPoint))
 			.build();
 	}
 	
