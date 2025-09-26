@@ -16,7 +16,9 @@
 	<artifactId>caiosystems</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>caiosystems</name>
-	<description>Validação de credênciais utilizando Spring Security</description>
+	<description>
+		Validação de credênciais utilizando Spring Security
+	</description>
 	<url/>
 	
 	<licenses>
@@ -99,7 +101,9 @@
 						</path>
 						<path>
 							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-configuration-processor</artifactId>
+							<artifactId>
+								spring-boot-configuration-processor
+							</artifactId>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
