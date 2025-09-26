@@ -71,7 +71,7 @@ public class SecurityConfig {
 	        .filter(url -> !url.isEmpty())
 	        .map(url -> Arrays.asList(url.split(",")))
 	        .orElseThrow(() -> new ResourceNotFoundException(
-	        	"Variável de ambiente não encontrada"));
+	        	"Environment variable not found"));
 		configuration.setAllowedOrigins(allowedOrigins);
 		configuration.setAllowedMethods(
 			Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
