@@ -1,5 +1,6 @@
 package com.example.caiosystems.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -33,11 +34,6 @@ public class UserClientController {
 		return ResponseEntity.ok(service.createUser(body));
 	}
 	
-	@PostMapping("/login")
-	public ResponseEntity<Boolean> login(String username, String password){
-		return ResponseEntity.ok(service.verifyUser(username, password));
-	}
-	
 	@GetMapping("/{id}")
 	public ResponseEntity<UserClient> findUserById(@PathVariable Long id) {
 		return ResponseEntity.ok(service.searchUserById(id));
@@ -60,5 +56,10 @@ public class UserClientController {
 	public ResponseEntity<String> deleteUser(@PathVariable Long id){
 		service.deleteUser(id);
 		return ResponseEntity.ok("User with id: "+id+" successfully deleted");
+	}
+	
+	@GetMapping("/auth")
+	public ResponseEntity<Boolean> isAuthenticated(Principal principal){
+		return ResponseEntity.ok(principal != null);
 	}
 }

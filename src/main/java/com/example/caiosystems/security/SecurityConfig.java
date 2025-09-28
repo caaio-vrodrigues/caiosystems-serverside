@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,6 +25,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.example.caiosystems.customexception.CustomAuthEntryPoint;
 import com.example.caiosystems.customexception.ResourceNotFoundException;
 import com.example.caiosystems.service.MyUserDetailsService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -50,17 +53,36 @@ public class SecurityConfig {
 					.requestMatchers(
 						"/h2-console/**", 
 						"/user/register", 
-						"/user/login")
+						"/user/auth")
 					.permitAll()
 					.anyRequest()
 					.authenticated())
-			.httpBasic(Customizer.withDefaults())
 			.headers(headers -> 
 				headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
-			.sessionManagement(session -> 
-				session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+			.formLogin(form -> form
+				.loginProcessingUrl("/user/login")
+				.successHandler((request, response, authentication) -> {
+					response.setStatus(HttpServletResponse.SC_OK);
+	                response.getWriter().write("true"); 
+	                response.getWriter().flush();
+				})
+				.failureHandler((request, response, exception) -> {
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	                response.getWriter().write("false");
+	                response.getWriter().flush();
+				}))
+			.sessionManagement(session -> session
+				.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+				.sessionFixation()
+				.newSession())
 			.exceptionHandling(exception -> exception
 				.authenticationEntryPoint(customAuthEntryPoint))
+			.logout(logout -> logout
+	            .logoutUrl("/logout")
+	            .invalidateHttpSession(true)
+	            .deleteCookies("JSESSIONID")
+	            .logoutSuccessHandler(
+	            	new HttpStatusReturningLogoutSuccessHandler()))
 			.build();
 	}
 	
