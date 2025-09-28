@@ -1,16 +1,22 @@
 package com.example.caiosystems.security;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import java.io.OutputStream;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,6 +31,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.example.caiosystems.customexception.CustomAuthEntryPoint;
 import com.example.caiosystems.customexception.ResourceNotFoundException;
 import com.example.caiosystems.service.MyUserDetailsService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -43,7 +50,8 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(
-		HttpSecurity http
+		HttpSecurity http,
+		ObjectMapper objectMapper
 	) throws Exception {
 		return http
 			.csrf(custom -> custom.disable())
@@ -67,9 +75,17 @@ public class SecurityConfig {
 	                response.getWriter().flush();
 				})
 				.failureHandler((request, response, exception) -> {
-					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	                response.getWriter().write("false");
-	                response.getWriter().flush();
+	                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+	                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	                Map<String, Object> body = new LinkedHashMap<>();
+	                body.put("timestamp", LocalDateTime.now());
+	                body.put("status", HttpStatus.UNAUTHORIZED.value());
+	                body.put("error", "Unauthorized");
+	                body.put("message", "Unable to recognize credentials");
+	                body.put("path", request.getRequestURI());
+	                OutputStream out = response.getOutputStream();
+	                objectMapper.writeValue(out, body);
+	                out.flush();
 				}))
 			.sessionManagement(session -> session
 				.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
