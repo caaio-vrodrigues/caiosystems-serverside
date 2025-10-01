@@ -20,6 +20,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -47,6 +48,13 @@ public class SecurityConfig {
 	public SecurityConfig(CustomAuthEntryPoint customAuthEntryPoint) {
         this.customAuthEntryPoint = customAuthEntryPoint;
     }
+	
+	@Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web
+    		.ignoring()
+    		.requestMatchers("/user/register", "/user/auth", "/h2-console/**");
+    }
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(
@@ -57,48 +65,45 @@ public class SecurityConfig {
 			.csrf(custom -> custom.disable())
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.authorizeHttpRequests(request -> 
-				request
-					.requestMatchers(
-						"/h2-console/**", 
-						"/user/register", 
-						"/user/auth")
-					.permitAll()
-					.anyRequest()
-					.authenticated())
+				request.anyRequest().authenticated())
 			.headers(headers -> 
 				headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
-			.formLogin(form -> form
-				.loginProcessingUrl("/user/login")
-				.successHandler((request, response, authentication) -> {
-					response.setStatus(HttpServletResponse.SC_OK);
-	                response.getWriter().write("true"); 
-	                response.getWriter().flush();
-				})
-				.failureHandler((request, response, exception) -> {
-	                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-	                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	                Map<String, Object> body = new LinkedHashMap<>();
-	                body.put("timestamp", LocalDateTime.now());
-	                body.put("status", HttpStatus.UNAUTHORIZED.value());
-	                body.put("error", "Unauthorized");
-	                body.put("message", "Unable to recognize credentials");
-	                body.put("path", request.getRequestURI());
-	                OutputStream out = response.getOutputStream();
-	                objectMapper.writeValue(out, body);
-	                out.flush();
-				}))
-			.sessionManagement(session -> session
-				.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-				.sessionFixation()
-				.newSession())
-			.exceptionHandling(exception -> exception
-				.authenticationEntryPoint(customAuthEntryPoint))
-			.logout(logout -> logout
-	            .logoutUrl("/logout")
-	            .invalidateHttpSession(true)
-	            .deleteCookies("JSESSIONID")
-	            .logoutSuccessHandler(
-	            	new HttpStatusReturningLogoutSuccessHandler()))
+			.formLogin(form -> 
+				form
+					.loginProcessingUrl("/user/login")
+					.successHandler((request, response, authentication) -> {
+						response.setStatus(HttpServletResponse.SC_OK);
+		                response.getWriter().write("true"); 
+		                response.getWriter().flush();
+					})
+					.failureHandler((request, response, exception) -> {
+		                response
+		                	.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		                Map<String, Object> body = new LinkedHashMap<>();
+		                body.put("timestamp", LocalDateTime.now());
+		                body.put("status", HttpStatus.UNAUTHORIZED.value());
+		                body.put("error", "Unauthorized");
+		                body.put("message", "Unable to recognize credentials");
+		                body.put("path", request.getRequestURI());
+		                OutputStream out = response.getOutputStream();
+		                objectMapper.writeValue(out, body);
+		                out.flush();
+					}))
+			.sessionManagement(session -> 
+				session
+					.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+					.sessionFixation()
+					.newSession())
+			.exceptionHandling(exception -> 
+				exception.authenticationEntryPoint(customAuthEntryPoint))
+			.logout(logout -> 
+				logout
+		            .logoutUrl("/logout")
+		            .invalidateHttpSession(true)
+		            .deleteCookies("JSESSIONID")
+		            .logoutSuccessHandler(
+		            	new HttpStatusReturningLogoutSuccessHandler()))
 			.build();
 	}
 	

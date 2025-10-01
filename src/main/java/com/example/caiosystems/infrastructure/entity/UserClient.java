@@ -22,24 +22,19 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserClient {
 	
+	private static final String ERR_PASSWORD = "Invalid password lenght, minimum 8 characters required";
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
     
-    @Column(
-    	name="username", 
-    	nullable=false, 
-    	unique=true)
+    @Column(name="username", nullable=false, unique=true)
     @NotBlank(message="Username cannot be blank")
     @Email(message="Invalid e-mail format")
     private String username;
     
-	@Column(
-		name="password", 
-		nullable=false)
-	@Size(
-    	min=8, 
-    	message="Invalid password lenght, minimum 8 characters required")
+	@Column(name="password", nullable=false)
+	@Size(min=8, message=ERR_PASSWORD)
     @NotBlank(message="Password cannot be blank")
 	private String password;
 }
