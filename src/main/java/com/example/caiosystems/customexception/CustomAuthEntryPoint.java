@@ -39,8 +39,8 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.UNAUTHORIZED.value());
-        body.put("error", "Unauthorized");
-        body.put("message", "Unable to recognize credentials");
+        body.put("error", "Incompatibility");
+        body.put("message", "Process incompatibility, check the method and features before submitting the request.");
         body.put("path", request.getRequestURI());
 
         OutputStream out = response.getOutputStream();
