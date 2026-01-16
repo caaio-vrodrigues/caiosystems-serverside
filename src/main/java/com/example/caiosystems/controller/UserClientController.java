@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.caiosystems.infrastructure.entity.UserClient;
 import com.example.caiosystems.infrastructure.entity.dto.CreateUserClientDTO;
 import com.example.caiosystems.infrastructure.entity.dto.ResponseUserClientDTO;
-import com.example.caiosystems.service.UserClientService;
+import com.example.caiosystems.service.userclient.UserClientService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

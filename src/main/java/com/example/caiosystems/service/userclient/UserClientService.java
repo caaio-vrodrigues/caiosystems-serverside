@@ -1,4 +1,4 @@
-package com.example.caiosystems.service;
+package com.example.caiosystems.service.userclient;
 
 import java.util.List;
 
@@ -15,6 +15,7 @@ import com.example.caiosystems.infrastructure.entity.UserClient;
 import com.example.caiosystems.infrastructure.entity.dto.CreateUserClientDTO;
 import com.example.caiosystems.infrastructure.entity.dto.ResponseUserClientDTO;
 import com.example.caiosystems.infrastructure.repository.UserClientRepository;
+import com.example.caiosystems.service.userclient.model.UserClientFinder;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,11 +23,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserClientService {
 	
-	private final UserClientRepository repo;
 	private final BCryptPasswordEncoder cryptedPassword;
+	private final UserClientRepository repo;
 	private final AuthenticationManager authenticationManager; 
+	private final UserClientFinder userClientFinderImpl;
 	
 	public ResponseUserClientDTO createUser(CreateUserClientDTO body) {
+		userClientFinderImpl.findByUsernameOnCreate(body.getUsername());
 		UserClient user = UserClient.builder()
 			.password(cryptedPassword.encode(body.getPassword()))
 			.username(body.getUsername())
