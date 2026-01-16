@@ -16,6 +16,7 @@ import com.example.caiosystems.infrastructure.entity.dto.CreateUserClientDTO;
 import com.example.caiosystems.infrastructure.entity.dto.ResponseUserClientDTO;
 import com.example.caiosystems.infrastructure.repository.UserClientRepository;
 import com.example.caiosystems.service.userclient.model.UserClientFinder;
+import com.example.caiosystems.service.userclient.model.UserClientSaverAndConcurrencyHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +28,7 @@ public class UserClientService {
 	private final UserClientRepository repo;
 	private final AuthenticationManager authenticationManager; 
 	private final UserClientFinder userClientFinderImpl;
+	private final UserClientSaverAndConcurrencyHandler userClientSaverAndConcurrencyHandler;
 	
 	public ResponseUserClientDTO createUser(CreateUserClientDTO body) {
 		userClientFinderImpl.findByUsernameOnCreate(body.getUsername());
@@ -34,7 +36,7 @@ public class UserClientService {
 			.password(cryptedPassword.encode(body.getPassword()))
 			.username(body.getUsername())
 			.build();
-		repo.saveAndFlush(user);
+		userClientSaverAndConcurrencyHandler.save(user);
 		return ResponseUserClientDTO.builder()
 			.username(user.getUsername())
 			.build();

@@ -5,4 +5,5 @@ import com.example.caiosystems.infrastructure.entity.UserClient;
 public interface UserClientFinder {
 	UserClient findByUsername(String userName);
 	UserClient findByUsernameOnCreate(String username);
+	void findByUsernameOnSave(String username);
 }
