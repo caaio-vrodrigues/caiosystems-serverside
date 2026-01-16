@@ -29,6 +29,14 @@ public class UserClientMessageCreatorImpl implements UserClientMessageCreator {
 			new Object[] {username},
 			LocaleContextHolder.getLocale());
 	}
+	
+	@Override
+	public String createUserNotFoundMsg(Long id) {
+		return messageSource.getMessage(
+			"userNotFound.id", 
+			new Object[] {id},
+			LocaleContextHolder.getLocale());
+	}
 
 	@Override
 	public String createConcurrentUserClient(String username) {

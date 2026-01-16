@@ -50,4 +50,12 @@ public class UserClientFinderImpl implements UserClientFinder {
 			throw new UserAlreadyExistsException(userAlreadyExistsMsg);
 		throw new ConcurrentUserClientException(concurrentUserMsg);
 	}
+
+	@Override
+	public UserClient findById(Long id) {
+		String userNotFoundMsg = userClientMessageCreator
+			.createUserNotFoundMsg(id);
+		return repo.findById(id).orElseThrow(() -> 
+			new UserNotFoundException(userNotFoundMsg));
+	}
 }

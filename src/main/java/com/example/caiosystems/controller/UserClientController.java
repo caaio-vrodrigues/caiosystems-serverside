@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.caiosystems.infrastructure.entity.UserClient;
 import com.example.caiosystems.infrastructure.entity.dto.CreateUserClientDTO;
 import com.example.caiosystems.infrastructure.entity.dto.ResponseUserClientDTO;
+import com.example.caiosystems.infrastructure.entity.dto.UpdateUserClientDTO;
 import com.example.caiosystems.service.userclient.UserClientService;
 
 import jakarta.validation.Valid;
@@ -49,13 +50,13 @@ public class UserClientController {
 		return ResponseEntity.ok(service.searchAllUsers());
 	}
 	
-//	@PutMapping
-//	public ResponseEntity<UserClient> editUser(
-//		Long id, 
-//		@Valid @RequestBody UserClient body
-//	){
-//		return ResponseEntity.ok(service.updateUser(id, body));
-//	}
+	@PutMapping("/{id}")
+	public ResponseEntity<ResponseUserClientDTO> editUser(
+		@PathVariable Long id, 
+		@Valid @RequestBody UpdateUserClientDTO body
+	){
+		return ResponseEntity.ok(service.updateUser(id, body));
+	}
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteUser(

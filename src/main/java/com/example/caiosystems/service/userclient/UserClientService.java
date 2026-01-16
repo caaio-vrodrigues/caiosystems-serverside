@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import com.example.caiosystems.customexception.ResourceNotFoundException;
 import com.example.caiosystems.infrastructure.entity.UserClient;
 import com.example.caiosystems.infrastructure.entity.dto.CreateUserClientDTO;
 import com.example.caiosystems.infrastructure.entity.dto.ResponseUserClientDTO;
+import com.example.caiosystems.infrastructure.entity.dto.UpdateUserClientDTO;
 import com.example.caiosystems.infrastructure.entity.dto.model.ResponseUserClientDTOCreator;
 import com.example.caiosystems.infrastructure.repository.UserClientRepository;
 import com.example.caiosystems.service.userclient.model.UserClientFinder;
@@ -53,12 +53,10 @@ public class UserClientService {
 		return repo.findAll();
 	}
 	
-//	public UserClient updateUser(Long id, UserClient body) {
-//		UserClient existsUser = searchUserById(id);
-//		body.setId(existsUser.getId());
-//		body.setPassword(cryptedPassword.encode(body.getPassword()));
-//		return repo.saveAndFlush(body);
-//	}
+	public ResponseUserClientDTO updateUser(Long id, UpdateUserClientDTO dto) {
+		UserClient user = userClientFinder.findById(id);
+		return null;
+	}
 	
 	public void deleteUser(Long id) {
 		if (!repo.existsById(id)) 
