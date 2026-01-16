@@ -14,6 +14,7 @@ import com.example.caiosystems.customexception.ResourceNotFoundException;
 import com.example.caiosystems.infrastructure.entity.UserClient;
 import com.example.caiosystems.infrastructure.entity.dto.CreateUserClientDTO;
 import com.example.caiosystems.infrastructure.entity.dto.ResponseUserClientDTO;
+import com.example.caiosystems.infrastructure.entity.dto.model.ResponseUserClientDTOCreator;
 import com.example.caiosystems.infrastructure.repository.UserClientRepository;
 import com.example.caiosystems.service.userclient.model.UserClientFinder;
 import com.example.caiosystems.service.userclient.model.UserClientSaverAndConcurrencyHandler;
@@ -27,19 +28,19 @@ public class UserClientService {
 	private final BCryptPasswordEncoder cryptedPassword;
 	private final UserClientRepository repo;
 	private final AuthenticationManager authenticationManager; 
-	private final UserClientFinder userClientFinderImpl;
+	private final UserClientFinder userClientFinder;
 	private final UserClientSaverAndConcurrencyHandler userClientSaverAndConcurrencyHandler;
+	private final ResponseUserClientDTOCreator responseUserClientDTOCreator;
 	
 	public ResponseUserClientDTO createUser(CreateUserClientDTO body) {
-		userClientFinderImpl.findByUsernameOnCreate(body.getUsername());
+		userClientFinder.findByUsernameOnCreate(body.getUsername());
 		UserClient user = UserClient.builder()
 			.password(cryptedPassword.encode(body.getPassword()))
 			.username(body.getUsername())
 			.build();
 		userClientSaverAndConcurrencyHandler.save(user);
-		return ResponseUserClientDTO.builder()
-			.username(user.getUsername())
-			.build();
+		return responseUserClientDTOCreator
+			.createResponseUserClientDTO(user.getUsername());
 	}
 	
 	public UserClient searchUserById(Long id) {
