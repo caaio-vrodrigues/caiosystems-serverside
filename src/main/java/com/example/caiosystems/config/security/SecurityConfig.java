@@ -1,4 +1,4 @@
-package com.example.caiosystems.config;
+package com.example.caiosystems.config.security;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -28,9 +28,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.example.caiosystems.config.security.model.SecurityConfigMessageCreator;
 import com.example.caiosystems.customexception.CustomAuthEntryPoint;
 import com.example.caiosystems.customexception.ResourceNotFoundException;
-import com.example.caiosystems.service.MyUserDetailsService;
+import com.example.caiosystems.service.userdetails.MyUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,10 +40,16 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 public class SecurityConfig {
 	
-	@Autowired
-	private MyUserDetailsService detailsService;
+	@Autowired private MyUserDetailsService detailsService;
+	@Autowired private SecurityConfigMessageCreator securityConfigMessageCreator;
 	private final CustomAuthEntryPoint customAuthEntryPoint;
 	private static final String CLIENT_URL = System.getenv("CLIENT_URL");
+	
+	private static final String TIMESTAMP_KEY = "timestamp";
+	private static final String STATUS = "status";
+	private static final String ERROR = "error";
+	private static final String MESSAGE = "message";
+	private static final String PATH = "path";
 	
 	public SecurityConfig(CustomAuthEntryPoint customAuthEntryPoint) {
         this.customAuthEntryPoint = customAuthEntryPoint;
@@ -80,11 +87,12 @@ public class SecurityConfig {
 		                	.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		                Map<String, Object> body = new LinkedHashMap<>();
-		                body.put("timestamp", LocalDateTime.now());
-		                body.put("status", HttpStatus.UNAUTHORIZED.value());
-		                body.put("error", "Não autorizado");
-		                body.put("message", "Credenciais inválidas. Verifique seu e-mail e senha antes de tentar novamente");
-		                body.put("path", request.getRequestURI());
+		                body.put(TIMESTAMP_KEY, LocalDateTime.now());
+		                body.put(STATUS, HttpStatus.UNAUTHORIZED.value());
+		                body.put(ERROR, "Não autorizado");
+		                body.put(MESSAGE, securityConfigMessageCreator
+		                	.createInvalidCredentialsMsg());
+		                body.put(PATH, request.getRequestURI());
 		                OutputStream out = response.getOutputStream();
 		                objectMapper.writeValue(out, body);
 		                out.flush();
@@ -112,8 +120,8 @@ public class SecurityConfig {
 		List<String> allowedOrigins = Optional.ofNullable(CLIENT_URL)
 	        .filter(url -> !url.isEmpty())
 	        .map(url -> Arrays.asList(url.split(",")))
-	        .orElseThrow(() -> new ResourceNotFoundException(
-	        	"Environment variable not found"));
+	        .orElseThrow(() -> new ResourceNotFoundException(securityConfigMessageCreator
+	        	.createEnvironmentVariableNotFoundMsg()));
 		configuration.setAllowedOrigins(allowedOrigins);
 		configuration.setAllowedMethods(
 			Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

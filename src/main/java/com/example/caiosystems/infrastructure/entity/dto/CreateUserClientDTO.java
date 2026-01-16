@@ -1,5 +1,7 @@
 package com.example.caiosystems.infrastructure.entity.dto;
 
+import com.example.caiosystems.service.userclient.model.UserClientMessageCreator;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -9,19 +11,19 @@ import lombok.Getter;
 @Getter
 @Builder
 public class CreateUserClientDTO {
-
-	private static final String ERR_PASSWORD = "Invalid password lenght, minimum 8 characters required";
+	
+	private final UserClientMessageCreator userClientMessageCreator;
 	
     @NotBlank(
-    	message="Username cannot be blank")
+    	message="{usernameNotBlank}")
     @Email(
-    	message="Invalid e-mail format")
+    	message="{username_invalidEmailFormat}")
     private String username;
     
-	@Size(
-		min=8, 
-		message=ERR_PASSWORD)
     @NotBlank(
-    	message="Password cannot be blank")
+    	message="{passwordNotBlank}")
+    @Size(
+		min=8, 
+		message="{passwordMinLength}")
 	private String password;
 }

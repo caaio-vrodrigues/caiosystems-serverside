@@ -1,4 +1,4 @@
-package com.example.caiosystems.service;
+package com.example.caiosystems.service.userdetails;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

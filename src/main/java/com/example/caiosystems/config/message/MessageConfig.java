@@ -1,4 +1,4 @@
-package com.example.caiosystems.config;
+package com.example.caiosystems.config.message;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +14,7 @@ public class MessageConfig {
 			new ReloadableResourceBundleMessageSource();
 		messageSource.setBasenames(
 			"classpath:message/user_client_messages",
+			"classpath:message/security_config_messages",
 			"classpath:ValidationMessages");
 		messageSource.setDefaultEncoding("UTF-8");
 		messageSource.setAlwaysUseMessageFormat(true);
