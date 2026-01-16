@@ -11,10 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.caiosystems.infrastructure.entity.UserClient;
+import com.example.caiosystems.infrastructure.entity.dto.CreateUserClientDTO;
+import com.example.caiosystems.infrastructure.entity.dto.ResponseUserClientDTO;
 import com.example.caiosystems.service.UserClientService;
 
 import jakarta.validation.Valid;
@@ -28,14 +29,16 @@ public class UserClientController {
 	private final UserClientService service;
 	
 	@PostMapping("/register")
-	public ResponseEntity<UserClient> newUser(
-		@Valid @RequestBody UserClient body
+	public ResponseEntity<ResponseUserClientDTO> newUser(
+		@Valid @RequestBody CreateUserClientDTO body
 	){
 		return ResponseEntity.ok(service.createUser(body));
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<UserClient> findUserById(@PathVariable Long id) {
+	public ResponseEntity<UserClient> findUserById(
+		@PathVariable Long id
+	){
 		return ResponseEntity.ok(service.searchUserById(id));
 	}
 	
@@ -44,16 +47,18 @@ public class UserClientController {
 		return ResponseEntity.ok(service.searchAllUsers());
 	}
 	
-	@PutMapping
-	public ResponseEntity<UserClient> editUser(
-		Long id, 
-		@Valid @RequestBody UserClient body
-	){
-		return ResponseEntity.ok(service.updateUser(id, body));
-	}
+//	@PutMapping
+//	public ResponseEntity<UserClient> editUser(
+//		Long id, 
+//		@Valid @RequestBody UserClient body
+//	){
+//		return ResponseEntity.ok(service.updateUser(id, body));
+//	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteUser(@PathVariable Long id){
+	public ResponseEntity<String> deleteUser(
+		@PathVariable Long id
+	){
 		service.deleteUser(id);
 		return ResponseEntity.ok("User with id: "+id+" successfully deleted");
 	}

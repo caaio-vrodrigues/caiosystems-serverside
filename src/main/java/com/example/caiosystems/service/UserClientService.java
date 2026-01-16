@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.caiosystems.customexception.ResourceNotFoundException;
 import com.example.caiosystems.infrastructure.entity.UserClient;
+import com.example.caiosystems.infrastructure.entity.dto.CreateUserClientDTO;
+import com.example.caiosystems.infrastructure.entity.dto.ResponseUserClientDTO;
 import com.example.caiosystems.infrastructure.repository.UserClientRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,9 +26,15 @@ public class UserClientService {
 	private final BCryptPasswordEncoder cryptedPassword;
 	private final AuthenticationManager authenticationManager; 
 	
-	public UserClient createUser(UserClient body) {
-		body.setPassword(cryptedPassword.encode(body.getPassword()));
-		return repo.saveAndFlush(body);
+	public ResponseUserClientDTO createUser(CreateUserClientDTO body) {
+		UserClient user = UserClient.builder()
+			.password(cryptedPassword.encode(body.getPassword()))
+			.username(body.getUsername())
+			.build();
+		repo.saveAndFlush(user);
+		return ResponseUserClientDTO.builder()
+			.username(user.getUsername())
+			.build();
 	}
 	
 	public UserClient searchUserById(Long id) {
@@ -39,12 +47,12 @@ public class UserClientService {
 		return repo.findAll();
 	}
 	
-	public UserClient updateUser(Long id, UserClient body) {
-		UserClient existsUser = searchUserById(id);
-		body.setId(existsUser.getId());
-		body.setPassword(cryptedPassword.encode(body.getPassword()));
-		return repo.saveAndFlush(body);
-	}
+//	public UserClient updateUser(Long id, UserClient body) {
+//		UserClient existsUser = searchUserById(id);
+//		body.setId(existsUser.getId());
+//		body.setPassword(cryptedPassword.encode(body.getPassword()));
+//		return repo.saveAndFlush(body);
+//	}
 	
 	public void deleteUser(Long id) {
 		if (!repo.existsById(id)) 
