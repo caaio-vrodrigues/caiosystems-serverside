@@ -8,4 +8,5 @@ import lombok.Getter;
 public class UpdateUserClientDTO {
 	
 	private String username;
+	private String password;
 }

@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.caiosystems.customexception.ResourceNotFoundException;
 import com.example.caiosystems.infrastructure.entity.UserClient;
@@ -18,6 +19,7 @@ import com.example.caiosystems.infrastructure.entity.dto.model.ResponseUserClien
 import com.example.caiosystems.infrastructure.repository.UserClientRepository;
 import com.example.caiosystems.service.userclient.model.UserClientFinder;
 import com.example.caiosystems.service.userclient.model.UserClientSaverAndConcurrencyHandler;
+import com.example.caiosystems.service.userclient.model.UserClientUpdateValidator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +33,9 @@ public class UserClientService {
 	private final UserClientFinder userClientFinder;
 	private final UserClientSaverAndConcurrencyHandler userClientSaverAndConcurrencyHandler;
 	private final ResponseUserClientDTOCreator responseUserClientDTOCreator;
+	private final UserClientUpdateValidator userClientUpdateValidator;
 	
+	@Transactional
 	public ResponseUserClientDTO createUser(CreateUserClientDTO body) {
 		userClientFinder.findByUsernameOnCreate(body.getUsername());
 		UserClient user = UserClient.builder()
@@ -53,9 +57,21 @@ public class UserClientService {
 		return repo.findAll();
 	}
 	
+	@Transactional
 	public ResponseUserClientDTO updateUser(Long id, UpdateUserClientDTO dto) {
 		UserClient user = userClientFinder.findById(id);
-		return null;
+		String newUsername = userClientUpdateValidator
+			.validateUsername(user.getUsername(), dto.getUsername());
+		String newPassword = userClientUpdateValidator
+			.validatePassword(user.getPassword(), dto.getPassword());
+		user = UserClient.builder()
+			.id(user.getId())
+			.username(newUsername)
+			.password(cryptedPassword.encode(newPassword))
+			.build();
+		userClientSaverAndConcurrencyHandler.save(user);
+		return responseUserClientDTOCreator
+			.createResponseUserClientDTO(user.getUsername());
 	}
 	
 	public void deleteUser(Long id) {
