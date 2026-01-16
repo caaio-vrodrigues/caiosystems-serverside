@@ -2,6 +2,8 @@ package com.example.caiosystems.service.userclient.impl;
 
 import java.util.Optional;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.example.caiosystems.customexception.ConcurrentUserClientException;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class UserClientFinderImpl implements UserClientFinder {
 	
 	private final UserClientRepository repo;
+	private final MessageSource messageSource;
 
 	@Override
 	public UserClient findByUsername(String userName) {
@@ -29,7 +32,11 @@ public class UserClientFinderImpl implements UserClientFinder {
 	public UserClient findByUsernameOnCreate(String username) {
 		Optional<UserClient> userOptional = repo.findByUsername(username);
 		if(userOptional.isEmpty()) return null;
-			throw new UserAlreadyExistsException("O e-mail: `"+username+"` já está em uso");
+			throw new UserAlreadyExistsException(
+				messageSource.getMessage(
+					"userAlreadyExists_username", 
+					new Object[] {username}, 
+					LocaleContextHolder.getLocale()));
 	}
 
 	@Override

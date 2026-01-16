@@ -1,4 +1,4 @@
-package com.example.caiosystems.security;
+package com.example.caiosystems.config;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -82,8 +82,8 @@ public class SecurityConfig {
 		                Map<String, Object> body = new LinkedHashMap<>();
 		                body.put("timestamp", LocalDateTime.now());
 		                body.put("status", HttpStatus.UNAUTHORIZED.value());
-		                body.put("error", "Unauthorized");
-		                body.put("message", "Unable to recognize credentials");
+		                body.put("error", "Não autorizado");
+		                body.put("message", "Credenciais inválidas. Verifique seu e-mail e senha antes de tentar novamente");
 		                body.put("path", request.getRequestURI());
 		                OutputStream out = response.getOutputStream();
 		                objectMapper.writeValue(out, body);
