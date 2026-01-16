@@ -3,6 +3,7 @@ package com.example.caiosystems.controller;
 import java.security.Principal;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,8 @@ public class UserClientController {
 	public ResponseEntity<ResponseUserClientDTO> newUser(
 		@Valid @RequestBody CreateUserClientDTO body
 	){
-		return ResponseEntity.ok(service.createUser(body));
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(service.createUser(body));
 	}
 	
 	@GetMapping("/{id}")
