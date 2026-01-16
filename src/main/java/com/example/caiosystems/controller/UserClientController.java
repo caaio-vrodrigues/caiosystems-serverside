@@ -46,7 +46,7 @@ public class UserClientController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<UserClient>> listUsers(){
+	public ResponseEntity<List<ResponseUserClientDTO>> listUsers(){
 		return ResponseEntity.ok(service.searchAllUsers());
 	}
 	

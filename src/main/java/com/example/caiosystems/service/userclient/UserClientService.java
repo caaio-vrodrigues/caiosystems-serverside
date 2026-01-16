@@ -53,8 +53,11 @@ public class UserClientService {
 				", verify the value before sending"));
 	}
 	
-	public List<UserClient> searchAllUsers() {
-		return repo.findAll();
+	public List<ResponseUserClientDTO> searchAllUsers() {
+		return repo.findAll().stream()
+			.map(user -> responseUserClientDTOCreator
+				.createResponseUserClientDTO(user.getUsername()))
+			.toList();
 	}
 	
 	@Transactional
