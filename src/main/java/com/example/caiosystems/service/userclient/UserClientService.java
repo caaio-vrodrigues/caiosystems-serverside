@@ -10,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.caiosystems.customexception.ResourceNotFoundException;
 import com.example.caiosystems.infrastructure.entity.UserClient;
 import com.example.caiosystems.infrastructure.entity.dto.CreateUserClientDTO;
 import com.example.caiosystems.infrastructure.entity.dto.ResponseUserClientDTO;
@@ -47,12 +46,14 @@ public class UserClientService {
 			.createResponseUserClientDTO(user.getUsername());
 	}
 	
-	public UserClient searchUserById(Long id) {
-		return repo.findById(id).orElseThrow(()->
-			new ResourceNotFoundException("Unable to find user with id: "+id+
-				", verify the value before sending"));
+	@Transactional(readOnly=true)
+	public ResponseUserClientDTO searchUserById(Long id) {
+		UserClient user = userClientFinder.findById(id);
+		return responseUserClientDTOCreator
+			.createResponseUserClientDTO(user.getUsername());
 	}
 	
+	@Transactional(readOnly=true)
 	public List<ResponseUserClientDTO> searchAllUsers() {
 		return repo.findAll().stream()
 			.map(user -> responseUserClientDTOCreator
@@ -63,27 +64,30 @@ public class UserClientService {
 	@Transactional
 	public ResponseUserClientDTO updateUser(Long id, UpdateUserClientDTO dto) {
 		UserClient user = userClientFinder.findById(id);
-		String newUsername = userClientUpdateValidator
-			.validateUsername(user.getUsername(), dto.getUsername());
-		String newPassword = userClientUpdateValidator
-			.validatePassword(user.getPassword(), dto.getPassword());
+		String newUsername = userClientUpdateValidator.validateUsername(
+			user.getUsername(), 
+			dto.getUsername());
+		String newPassword = userClientUpdateValidator.validatePassword(
+			user.getPassword(), 
+			dto.getPassword());
 		user = UserClient.builder()
 			.id(user.getId())
 			.username(newUsername)
-			.password(cryptedPassword.encode(newPassword))
+			.password(newPassword)
 			.build();
 		userClientSaverAndConcurrencyHandler.save(user);
 		return responseUserClientDTOCreator
 			.createResponseUserClientDTO(user.getUsername());
 	}
 	
-	public void deleteUser(Long id) {
-		if (!repo.existsById(id)) 
-			throw new ResourceNotFoundException("Unable to delete user with id: "
-				+id+", verify the value before sending");
+	@Transactional
+	public boolean deleteUser(Long id) {
+		userClientFinder.findById(id);
 		repo.deleteById(id);
+		return true;
 	}
 	
+	@Transactional(readOnly=true)
 	public boolean verifyUser(String username, String rawPassword) {
         UsernamePasswordAuthenticationToken authToken =
         	new UsernamePasswordAuthenticationToken(username, rawPassword);

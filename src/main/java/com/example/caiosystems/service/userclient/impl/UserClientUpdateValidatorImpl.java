@@ -1,5 +1,6 @@
 package com.example.caiosystems.service.userclient.impl;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.example.caiosystems.service.userclient.model.UserClientUpdateValidator;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class UserClientUpdateValidatorImpl implements UserClientUpdateValidator {
+	
+	private final BCryptPasswordEncoder cryptedPassword;
 
 	@Override
 	public String validateUsername(String currentUsername, String newUserName) {
@@ -20,9 +23,8 @@ public class UserClientUpdateValidatorImpl implements UserClientUpdateValidator 
 
 	@Override
 	public String validatePassword(String currentPassword, String newPassword) {
-		boolean usernameNotNullAndIsDifferent = newPassword != null && 
-			!currentPassword.equals(newPassword);
-		if(usernameNotNullAndIsDifferent) return newPassword;
+		boolean usernameNotNull = newPassword != null;
+		if(usernameNotNull) return cryptedPassword.encode(newPassword);
 		return currentPassword;
 	}
 }

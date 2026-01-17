@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.caiosystems.infrastructure.entity.UserClient;
 import com.example.caiosystems.infrastructure.entity.dto.CreateUserClientDTO;
 import com.example.caiosystems.infrastructure.entity.dto.ResponseUserClientDTO;
 import com.example.caiosystems.infrastructure.entity.dto.UpdateUserClientDTO;
@@ -39,7 +38,7 @@ public class UserClientController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<UserClient> findUserById(
+	public ResponseEntity<ResponseUserClientDTO> findUserById(
 		@PathVariable Long id
 	){
 		return ResponseEntity.ok(service.searchUserById(id));
@@ -59,11 +58,10 @@ public class UserClientController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteUser(
+	public ResponseEntity<Boolean> deleteUser(
 		@PathVariable Long id
 	){
-		service.deleteUser(id);
-		return ResponseEntity.ok("User with id: "+id+" successfully deleted");
+		return ResponseEntity.ok(service.deleteUser(id));
 	}
 	
 	@GetMapping("/auth")
